@@ -330,6 +330,20 @@ section h3{
 }
 .ref-left,.ref-right{ font-size:13.5px; color:#000000; }
 .ref-left .ref-note{ font-size:11.5px; color:#000000; margin-top:2px; }
+.ref-right.ref-stack{
+  text-align:right;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:2px;
+}
+.ref-left.ref-quote{
+  font-weight:1000;
+  letter-spacing:2.2px;
+  font-size:12px;
+  color:#0b1220;
+  text-transform:uppercase;
+}
 
 
 /* Customer info — underline style */
@@ -412,11 +426,11 @@ section h3{
   align-items:center;
   justify-content:space-between;
   gap:10px;
-  margin:6px 0 10px;
+  margin:8px 0 10px;
   padding:10px 12px;
-  background:#3fff8c;
-  border:1px solid #000000;
-  border-radius:10px;
+  background:transparent;
+  border:1px solid rgba(2,6,23,.12);
+  border-radius:12px;
 }
 .price-title-left{
   flex:1 1 auto;
@@ -424,9 +438,9 @@ section h3{
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
-  color:#000000;
-  font-size:14px;
-  line-height:1.15;
+  color:#0f172a;
+  font-size:13.5px;
+  line-height:1.25;
 }
 .sft-cal{
   /* margin-left: 5px; */
@@ -439,13 +453,13 @@ section h3{
 .tier-badge{
   flex:0 0 auto;
   white-space:nowrap;
-  font-weight:800;
-  font-size:14px;
+  font-weight:700;
+  font-size:13px;
   padding:4px 10px;
   line-height:1.2;
   border-radius:999px;
-  border:1px solid #000;
-  background:#fff;
+  border:1px solid rgba(2,6,23,.14);
+  background:transparent;
 }
 .tier-badge.gold{ color:#000; background:#fff; }
 .tier-badge.platinum{ color:#000; background:#f8fbff; }
@@ -530,6 +544,78 @@ section h3{
   font-weight:500;
   color:#000000;
   margin-top:2px;
+}
+
+/* ===========================
+   QUOTE ITEMS — MINIMAL (NO TABLE)
+   =========================== */
+.quote-items{
+  margin-top:14px;
+  background:transparent;
+}
+.qi-row{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  padding:10px 0;
+  border-bottom:1px solid rgba(2,6,23,.12);
+}
+.qi-row:last-child{ border-bottom:0; }
+.qi-main{ min-width:0; flex:1 1 auto; }
+.qi-name{
+  color:#0f172a;
+  font-weight:650;
+  font-size:13.5px;
+  line-height:1.25;
+}
+.qi-sl{
+  display:inline-block;
+  min-width:18px;
+  font-weight:800;
+}
+.qi-meta{
+  margin-top:4px;
+  color:#475569;
+  font-size:11.5px;
+  line-height:1.25;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.qi-dot{ opacity:.6; }
+.qi-amt{
+  flex:0 0 auto;
+  text-align:right;
+  font-weight:800;
+  font-size:13.5px;
+  color:#0b1220;
+  white-space:nowrap;
+}
+
+.quote-totals{
+  margin-top:12px;
+  padding-top:10px;
+  border-top:1px solid rgba(2,6,23,.18);
+  max-width:320px;
+  margin-left:auto;
+}
+.qt-row{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+  padding:4px 0;
+  font-size:12.5px;
+  color:#0f172a;
+}
+.qt-label{ color:#334155; }
+.qt-value{ font-weight:800; color:#0b1220; white-space:nowrap; }
+.qt-grand{
+  padding-top:8px;
+  margin-top:6px;
+  border-top:1px solid rgba(2,6,23,.14);
+  font-size:13.5px;
 }
 
 /* In words */
@@ -710,7 +796,7 @@ section h3{
   position:absolute;
   /* Place in clean white area (no overlay on header template) */
   top:140px;
-  right:44px;
+  left:44px;
   z-index:2;
   font-weight:1000;
   letter-spacing:2.2px;
@@ -724,10 +810,13 @@ section h3{
   backdrop-filter:none;
 }
 
+/* QUOTATION label is now part of the Ref/Date row */
+.invoice--pdf-scale .pdf-doc-label{ display:none; }
+
 /* Page padding & baseline typography */
 .invoice--pdf-scale .invoice-inner{
   transform:none !important;
-  padding:148px 44px 96px 44px !important; /* keep clear of template strips */
+  padding:134px 44px 96px 44px !important; /* tighter under header strip */
   color:#0b1220 !important;
 }
 
@@ -825,6 +914,7 @@ section h3{
   border-bottom:1px solid rgba(2,6,23,.18) !important;
   padding-bottom:10px;
   margin-bottom:12px;
+  margin-top:0;
 }
 .invoice--pdf-scale .ref-left,
 .invoice--pdf-scale .ref-right{
@@ -842,10 +932,10 @@ section h3{
 }
 .invoice--pdf-scale .info-box .info-title{
   padding:0 0 8px 0;
-  font-size:12px;
+  font-size:13.5px;
   letter-spacing:.4px;
-  text-transform:uppercase;
-  font-weight:900;
+  text-transform:none;
+  font-weight:800;
 }
 .invoice--pdf-scale .info-box .info-grid{
   gap:8px 14px;
@@ -857,14 +947,14 @@ section h3{
 
 /* Title pill */
 .invoice--pdf-scale .price-title{
-  background:linear-gradient(90deg,#0b1220,#1f2937) !important;
-  border:0 !important;
+  background:transparent !important;
+  border:1px solid rgba(2,6,23,.14) !important;
   border-radius:12px !important;
-  padding:12px 14px !important;
+  padding:10px 12px !important;
   margin:0 0 10px 0 !important;
 }
 .invoice--pdf-scale .price-title-left{
-  color:#ffffff !important;
+  color:#0f172a !important;
   font-size:12.5px !important;
   white-space:normal;
   overflow:visible;
@@ -872,16 +962,16 @@ section h3{
   line-height:1.35;
 }
 .invoice--pdf-scale .tech-badge{
-  color:#e2e8f0;
+  color:#0f172a;
   font-weight:900;
 }
 .invoice--pdf-scale .tier-badge{
-  border:0 !important;
-  background:#ffffff !important;
+  border:1px solid rgba(2,6,23,.14) !important;
+  background:transparent !important;
   color:#0b1220 !important;
   font-size:11.5px !important;
-  padding:7px 10px !important;
-  box-shadow:0 6px 18px rgba(2,6,23,.12);
+  padding:6px 10px !important;
+  box-shadow:none !important;
 }
 
 /* Table - modern quotation style */
@@ -987,32 +1077,119 @@ section h3{
   line-height:1.35;
 }
 
-/* Terms page tweaks in PDF */
+/* Terms page — PDF capture (scaled): plain B&W, easy to read */
 .invoice--pdf-scale .invoice-panel.terms-panel{
-  border:1px solid rgba(2,6,23,.14);
-  border-radius:12px;
+  border:1px solid #ccc;
+  border-radius:6px;
   padding:14px 16px !important;
   background:#fff !important;
   font-size:12.5px;
   margin-top:10px;
+  box-shadow:none;
+}
+.invoice--pdf-scale .terms-hero{
+  margin-bottom:12px !important;
+  padding-bottom:10px !important;
+  border-bottom:1px solid #ddd;
 }
 .invoice--pdf-scale .terms-title{
-  background:#0b1220 !important;
-  border-radius:10px !important;
-  padding:10px 12px !important;
+  background:transparent !important;
+  border-radius:0 !important;
+  padding:0 !important;
+  margin:0 0 4px 0 !important;
+  text-align:left !important;
   font-size:16px !important;
-  letter-spacing:.5px;
-  margin-bottom:14px !important;
+  font-weight:700 !important;
+  letter-spacing:0;
+  color:#000 !important;
+  line-height:1.25 !important;
+}
+.invoice--pdf-scale .terms-hero__lead{
+  margin:0 !important;
+  font-size:11px !important;
+  line-height:1.45 !important;
+  color:#444 !important;
+  font-weight:400;
+  max-width:none;
+}
+.invoice--pdf-scale .terms-card{
+  padding:10px 0 !important;
+  margin-bottom:0 !important;
+  border-radius:0 !important;
+  border:none !important;
+  border-bottom:1px solid #e0e0e0 !important;
+  background:transparent !important;
+  box-shadow:none;
+}
+.invoice--pdf-scale .terms-section:last-child .terms-card{
+  border-bottom:none !important;
+  margin-bottom:0 !important;
+}
+.invoice--pdf-scale .terms-card__head{
+  gap:10px !important;
+  align-items:center !important;
+  margin-bottom:6px !important;
+  padding-bottom:0 !important;
+  border-bottom:none !important;
+}
+.invoice--pdf-scale .terms-card__step{
+  min-width:22px !important;
+  height:22px !important;
+  font-size:11px !important;
+  font-weight:700 !important;
+  border-radius:2px !important;
+  background:#f0f0f0 !important;
+  color:#000 !important;
+  border:1px solid #999 !important;
+  box-shadow:none !important;
 }
 .invoice--pdf-scale .terms-h{
-  font-size:13px !important;
+  font-size:12.5px !important;
+  line-height:1.3 !important;
+  margin:0 !important;
+  font-weight:700 !important;
+  color:#000 !important;
 }
 .invoice--pdf-scale .terms-p{
-  font-size:12px !important;
+  font-size:11.5px !important;
+  margin:0 0 6px 0 !important;
+  color:#222 !important;
+  font-weight:400;
+}
+.invoice--pdf-scale .terms-sublist{
+  margin:0 !important;
+  padding:0 !important;
+  list-style:none !important;
+  counter-reset:termsroman;
 }
 .invoice--pdf-scale .terms-sublist li{
-  font-size:12px !important;
-  line-height:1.55 !important;
+  font-size:11.5px !important;
+  line-height:1.5 !important;
+  color:#111 !important;
+  position:relative;
+  padding:0 0 5px 22px !important;
+  margin:0 !important;
+  border-radius:0;
+  background:transparent !important;
+  border:none !important;
+}
+.invoice--pdf-scale .terms-sublist li::before{
+  counter-increment:termsroman;
+  content:counter(termsroman,lower-roman) ".";
+  position:absolute;
+  left:0;
+  top:0;
+  font-size:11px;
+  font-weight:600;
+  color:#000;
+  font-variant-numeric:tabular-nums;
+}
+.invoice--pdf-scale .terms-list{
+  padding-left:0 !important;
+}
+.invoice--pdf-scale .terms-section{
+  list-style:none !important;
+  margin-bottom:0 !important;
 }
 
 @media print{
@@ -1383,80 +1560,169 @@ section h3{
 }
 
 /* ------------------------------------------
-   C) TERMS PANEL TYPOGRAPHY
+   B) TERMS PANEL (container)
 ------------------------------------------- */
 .invoice-panel.terms-panel{
   font-family: inherit;
-  color:#000000;
-
-  font-size: 16px;                /* 🔥 paragraph base size increased */
-  line-height: 1.6;                 /* 🔥 better readability */
-  font-weight: 500;
-
+  color: #222;
+  font-size: 16px;
+  line-height: 1.55;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: geometricPrecision;
-
   margin-bottom: 80px;
+  padding: 20px 22px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: none;
 }
 
 /* ------------------------------------------
-   D) TITLE BAR
+   C) HERO — short, plain
 ------------------------------------------- */
-.terms-title{
-  background:#2f6fab;
-  color:#fff;
-  text-align:center;
+.terms-hero{
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #ddd;
+}
 
-  font-weight:800;
-  font-size:21px;                   /* slightly bigger */
+.invoice-panel.terms-panel .terms-title{
+  margin: 0 0 6px 0;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  text-align: left;
+  font-weight: 700;
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  letter-spacing: 0;
+  color: #000;
+  line-height: 1.25;
+}
 
-  padding: 10px;
-  border-radius:6px;
-  margin-bottom: 20px;
-  letter-spacing:.8px;
+.terms-hero__lead{
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #444;
+  font-weight: 400;
+  max-width: 40em;
 }
 
 /* ------------------------------------------
-   E) LIST / SECTION SPACING
+   D) SECTION CARDS (outer list = no markers)
 ------------------------------------------- */
 .terms-list{
-  margin:0;
-  padding-left:16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .terms-section{
-  margin-bottom:12px;
+  list-style: none;
+  margin: 0;
+}
+
+.terms-section:last-child{
+  margin-bottom: 0;
+}
+
+.terms-card{
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
+  border-radius: 0;
+  padding: 14px 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.terms-section:last-child .terms-card{
+  border-bottom: none;
+}
+
+.terms-card__head{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.terms-card__step{
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  border-radius: 2px;
+  background: #f0f0f0;
+  color: #000;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0;
+  border: 1px solid #999;
+  box-shadow: none;
 }
 
 /* ------------------------------------------
-   F) HEADINGS + PARAGRAPH
+   E) HEADINGS + BODY TEXT
 ------------------------------------------- */
-.terms-h{
-  font-weight:700;
-  font-size:18.5px;                 /* 🔥 clearer section heading */
-  margin-bottom:5px;
-  color:#000;
+.invoice-panel.terms-panel .terms-h{
+  margin: 0;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #000;
+  line-height: 1.35;
+  letter-spacing: 0;
 }
 
 .terms-p{
-  margin:4px 0 6px 0;
-  font-size:14.5px;                 /* 🔥 explicit for safety */
-  font-weight:500;
-  color:#000;
+  margin: 0 0 8px 0;
+  font-size: 15px;
+  font-weight: 400;
+  color: #222;
+  line-height: 1.55;
 }
 
-/* Sub list (i, ii, iii…) */
+/* ------------------------------------------
+   F) SUB-LISTS — roman numerals, row styling
+------------------------------------------- */
 .terms-sublist{
-  margin-top:4px;
-  padding-left:18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: termsroman;
 }
 
 .terms-sublist li{
-  margin-bottom:4px;
-  font-size:16px;                 /* 🔥 this fixes circled text */
-  line-height:1.6;
-  
+  position: relative;
+  margin: 0 0 6px 0;
+  padding: 0 0 0 26px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: #222;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+}
+
+.terms-sublist li:last-child{
+  margin-bottom: 0;
+}
+
+.terms-sublist li::before{
+  counter-increment: termsroman;
+  content: counter(termsroman, lower-roman) ".";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ------------------------------------------
@@ -1474,5 +1740,6 @@ section h3{
 
   .invoice-panel.terms-panel{
     text-rendering: geometricPrecision !important;
+    box-shadow: none !important;
   }
 }

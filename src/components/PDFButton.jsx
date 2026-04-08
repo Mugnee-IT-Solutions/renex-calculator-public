@@ -1,9 +1,11 @@
 // src/components/PDFButton.jsx
 import html2canvas from "html2canvas";
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, rgb } from "pdf-lib";
 
 const A4 = { w: 595.28, h: 841.89 };
 const EXPORT_PX = { w: 2480, h: 3508 };
+const TEMPLATE_A4_PX = { w: 794, h: 1123 }; // matches invoice-wrap export width/height
+const TEMPLATE_STRIP_PX = { headerH: 132, footerH: 82 }; // from CSS (pdf-template-header/footer)
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function encodePublicPath(path) {
@@ -162,9 +164,7 @@ async function appendPdfFromPublic(pdf, relativePath) {
   }
 
   const sourceBytes = await response.arrayBuffer();
-  const sourcePdf = await PDFDocument.load(sourceBytes);
-  const copiedPages = await pdf.copyPages(sourcePdf, sourcePdf.getPageIndices());
-  copiedPages.forEach((page) => pdf.addPage(page));
+  return sourceBytes;
 }
 
 export default function PDFButton({
@@ -202,6 +202,200 @@ export default function PDFButton({
     return bytes;
   };
 
+  const cropTemplateStrips = async () => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = "/Renex_Invoice.png";
+
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+    });
+
+    const { naturalWidth: w, naturalHeight: h } = img;
+    const headerCropH = Math.round((h * TEMPLATE_STRIP_PX.headerH) / TEMPLATE_A4_PX.h);
+    const footerCropH = Math.round((h * TEMPLATE_STRIP_PX.footerH) / TEMPLATE_A4_PX.h);
+
+    const toPngBytes = async (sx, sy, sw, sh) => {
+      const canvas = document.createElement("canvas");
+      canvas.width = sw;
+      canvas.height = sh;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+      const dataUrl = canvas.toDataURL("image/png");
+      return await (await fetch(dataUrl)).arrayBuffer();
+    };
+
+    const headerBytes = await toPngBytes(0, 0, w, headerCropH);
+    const footerBytes = await toPngBytes(0, h - footerCropH, w, footerCropH);
+
+    return { headerBytes, footerBytes };
+  };
+
+  const isFramePdfPath = (relativePath = "") => /(^|[\\/])frame\.pdf$/i.test(String(relativePath));
+
+  const getAppendLayoutMode = (relativePath = "") => {
+    // Some vendor/spec PDFs already include their own header/footer near the edges.
+    // For those, we crop away the edge areas before fitting, then overlay our strips.
+    const p = String(relativePath).toLowerCase();
+    if (
+      p.includes("module catalogue") ||
+      p.includes("processor and controller") ||
+      p.includes("recieving card") ||
+      p.includes("specifications") ||
+      p.includes("cabinet") ||
+      p.includes("brochure")
+    ) {
+      return "crop"; // remove edge headers/footers, then overlay our strips
+    }
+    return "safe"; // keep content below header/footer
+  };
+
+  const appendPlainPdfPages = async (pdf, sourceBytes) => {
+    // For PDFs that already include the company header/footer (e.g. Frame.pdf),
+    // we keep them as-is but normalize page size to A4.
+    const src = await PDFDocument.load(sourceBytes);
+    const pageCount = src.getPageCount();
+
+    for (let i = 0; i < pageCount; i++) {
+      const [embedded] = await pdf.embedPdf(sourceBytes, [i]);
+      const { width: pw, height: ph } = embedded.size();
+
+      const scale = Math.min(A4.w / pw, A4.h / ph);
+      const drawW = pw * scale;
+      const drawH = ph * scale;
+      const x = (A4.w - drawW) / 2;
+      const y = (A4.h - drawH) / 2;
+
+      const page = pdf.addPage([A4.w, A4.h]);
+      page.drawPage(embedded, { x, y, width: drawW, height: drawH });
+    }
+  };
+
+  const getCropFractions = (relativePath = "") => {
+    // Default crop removes typical baked header/footer areas.
+    // Some PDFs can have taller bands, but keep behaviour consistent across files.
+    const p = String(relativePath).toLowerCase();
+    if (p.includes("power supply")) {
+      return { top: 0.20, bottom: 0.14 };
+    }
+    if (p.includes("recieving card")) {
+      return { top: 0.18, bottom: 0.12 };
+    }
+    return { top: 0.14, bottom: 0.10 };
+  };
+
+  const appendFramedPdfPages = async (
+    pdf,
+    sourceBytes,
+    { headerImg, footerImg, headerH, footerH, mode = "safe", relativePath = "" }
+  ) => {
+    const src = await PDFDocument.load(sourceBytes);
+    const pageCount = src.getPageCount();
+
+    for (let i = 0; i < pageCount; i++) {
+      let embedded;
+      let pw; // embedded width
+      let ph; // embedded height
+
+      // In crop mode, remove some edge area (where many PDFs put their own headers/footers)
+      // so our own header/footer can be overlaid without doubles or content overlap.
+      if (mode === "crop") {
+        const srcPage = src.getPage(i);
+        const srcW = srcPage.getWidth();
+        const srcH = srcPage.getHeight();
+
+        const { top: topFrac, bottom: bottomFrac } = getCropFractions(relativePath);
+        const cropTop = srcH * topFrac;
+        const cropBottom = srcH * bottomFrac;
+
+        try {
+          [embedded] = await pdf.embedPdf(sourceBytes, [i], {
+            // pdf-lib bounding box uses PDF points with origin at bottom-left
+            boundingBox: {
+              left: 0,
+              bottom: cropBottom,
+              right: srcW,
+              top: srcH - cropTop,
+            },
+          });
+          // IMPORTANT: after cropping, the embedded page has a NEW size.
+          // Use that size for fitting, otherwise we may “shrink” and reveal the baked header/footer again.
+          const size = embedded.size();
+          pw = size.width;
+          ph = size.height;
+        } catch {
+          // Fallback: if boundingBox is not supported in runtime, embed full page.
+          [embedded] = await pdf.embedPdf(sourceBytes, [i]);
+          const size = embedded.size();
+          pw = size.width;
+          ph = size.height;
+        }
+      } else {
+        [embedded] = await pdf.embedPdf(sourceBytes, [i]);
+        const size = embedded.size();
+        pw = size.width;
+        ph = size.height;
+      }
+
+      let drawW, drawH, x, y;
+      if (mode === "safe") {
+        // Keep a safe content area so nothing is hidden under our header/footer strips.
+        const safeTop = 14; // pt (extra cushion)
+        const safeBottom = 10; // pt
+        const availableH = A4.h - headerH - footerH - safeTop - safeBottom;
+        const scale = Math.min(A4.w / pw, availableH / ph);
+        drawW = pw * scale;
+        drawH = ph * scale;
+        x = (A4.w - drawW) / 2;
+        y = footerH + safeBottom + (availableH - drawH) / 2;
+      } else {
+        // crop mode: fit into the same safe area, but the embedded page is already cropped
+        // so doubles won't show even when we overlay strips.
+        const safeTop = 8; // pt
+        const safeBottom = 6; // pt
+        const availableH = A4.h - headerH - footerH - safeTop - safeBottom;
+        const scale = Math.min(A4.w / pw, availableH / ph);
+        drawW = pw * scale;
+        drawH = ph * scale;
+        x = (A4.w - drawW) / 2;
+        y = footerH + safeBottom + (availableH - drawH) / 2;
+      }
+
+      const page = pdf.addPage([A4.w, A4.h]);
+
+      // content first
+      page.drawPage(embedded, { x, y, width: drawW, height: drawH });
+
+      // Extra safety: in crop mode, cover a slightly larger band so any baked
+      // header/footer that extends below strips never peeks through (Frame.pdf issue).
+      if (mode === "crop") {
+        const extraTop = 22; // pt
+        const extraBottom = 16; // pt
+        page.drawRectangle({
+          x: 0,
+          y: A4.h - (headerH + extraTop),
+          width: A4.w,
+          height: headerH + extraTop,
+          color: rgb(1, 1, 1),
+          opacity: 1,
+        });
+        page.drawRectangle({
+          x: 0,
+          y: 0,
+          width: A4.w,
+          height: footerH + extraBottom,
+          color: rgb(1, 1, 1),
+          opacity: 1,
+        });
+      }
+
+      // header/footer on top (cover any source header/footer)
+      page.drawImage(headerImg, { x: 0, y: A4.h - headerH, width: A4.w, height: headerH });
+      page.drawImage(footerImg, { x: 0, y: 0, width: A4.w, height: footerH });
+    }
+  };
+
   const handleDownload = async () => {
     const ids = Array.isArray(targetIds) && targetIds.length ? targetIds : [targetId];
     const els = ids.map((id) => document.getElementById(id)).filter(Boolean);
@@ -221,10 +415,26 @@ export default function PDFButton({
         page.drawImage(img, { x: 0, y: 0, width: A4.w, height: A4.h });
       }
 
+      // Template header/footer for EVERY appended page (catalogue/spec PDFs)
+      const { headerBytes, footerBytes } = await cropTemplateStrips();
+      const headerImg = await pdf.embedPng(headerBytes);
+      const footerImg = await pdf.embedPng(footerBytes);
+      const headerH = A4.w * (TEMPLATE_STRIP_PX.headerH / TEMPLATE_A4_PX.w);
+      const footerH = A4.w * (TEMPLATE_STRIP_PX.footerH / TEMPLATE_A4_PX.w);
+
       const cataloguePaths = getCataloguePaths(exportData);
       for (const relativePath of cataloguePaths) {
         try {
-          await appendPdfFromPublic(pdf, relativePath);
+          const sourceBytes = await appendPdfFromPublic(pdf, relativePath);
+          // ONLY special-case: Frame.pdf already has header/footer baked in.
+          // We should NOT overlay our strips, otherwise it becomes double.
+          if (isFramePdfPath(relativePath)) {
+            await appendPlainPdfPages(pdf, sourceBytes);
+          } else {
+            // Everything else stays unchanged.
+            const mode = getAppendLayoutMode(relativePath);
+            await appendFramedPdfPages(pdf, sourceBytes, { headerImg, footerImg, headerH, footerH, mode, relativePath });
+          }
         } catch (catalogueError) {
           console.warn(catalogueError);
         }

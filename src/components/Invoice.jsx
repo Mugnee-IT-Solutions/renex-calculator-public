@@ -151,17 +151,20 @@ const Invoice = forwardRef(function Invoice({ calc, snapshot, orderDate = new Da
 
       {/* Ref + Date */}
       <div className="ref-row tidy">
-        <div className="ref-left">
-          <strong>Ref:</strong> {refNo}
-        </div>
-        <div className="ref-right">
-          <strong>Date:</strong> {dateStr}
+        <div className="ref-left ref-quote">QUOTATION</div>
+        <div className="ref-right ref-stack">
+          <div>
+            <strong>Date:</strong> {dateStr}
+          </div>
+          <div>
+            <strong>Ref:</strong> {refNo}
+          </div>
         </div>
       </div>
 
       {/* Customer box */}
       <div className="info-box">
-        <div className="info-title">To</div>
+        <div className="info-title">Client Details</div>
 
         <div className="info-grid">
           <div>
@@ -206,96 +209,64 @@ const Invoice = forwardRef(function Invoice({ calc, snapshot, orderDate = new Da
           </div>
         </div>
 
-        <table className="table invoice-table">
-          <thead>
-            <tr>
-              <th style={{ width: 10 }} className="td-center">
-                SL.
-              </th>
-              <th className="td-center">Item Name</th>
-              <th style={{ width: 20 }} className="td-center">
-                Unit
-              </th>
-              <th style={{ width: 20 }} className="td-center">
-                Qty
-              </th>
-              <th style={{ width: 70 }} className="td-center">
-                Unit Price ৳
-              </th>
-              <th style={{ width: 80 }} className="td-center">
-                Total Price ৳
-              </th>
-            </tr>
-          </thead>
+        <div className="quote-items" role="list" aria-label="Quotation items">
+          {rows.map((r) => (
+            <div key={r.sl} className="qi-row" role="listitem">
+              <div className="qi-main">
+                <div className="qi-name">
+                  <span className="qi-sl">{r.sl}.</span> {r.name}
+                </div>
+                <div className="qi-meta">
+                  <span>
+                    {r.qty} {r.unit}
+                  </span>
+                  <span className="qi-dot" aria-hidden="true">
+                    •
+                  </span>
+                  <span>
+                    Unit: <b>{toBDT(r.unitPrice)}</b>
+                  </span>
+                  {r.brand ? (
+                    <>
+                      <span className="qi-dot" aria-hidden="true">
+                        •
+                      </span>
+                      <span>Brand: {r.brand}</span>
+                    </>
+                  ) : null}
+                </div>
+              </div>
+              <div className="qi-amt">{toBDT(r.total)}</div>
+            </div>
+          ))}
+        </div>
 
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.sl} className={r.className || ""}>
-                <td className="td-center">{r.sl}</td>
-                <td>
-                  <div className="item-name">{r.name}</div>
-                  {r.brand ? <div className="item-brand">Brand: {r.brand}</div> : null}
-                </td>
-                <td className="td-center">{r.unit}</td>
-                <td className="td-center">{r.qty}</td>
-                <td className="td-right">{toBDT(r.unitPrice)}</td>
-                <td className="td-right">{toBDT(r.total)}</td>
-              </tr>
-            ))}
+        <div className="quote-totals" aria-label="Totals">
+          {totals?.vatEnabled ? (
+            <>
+              <div className="qt-row">
+                <div className="qt-label">Total</div>
+                <div className="qt-value">{toBDT(totals.totalBeforeVat)}</div>
+              </div>
+              <div className="qt-row">
+                <div className="qt-label">VAT ({Math.round((totals.vatRate || 0.1) * 100)}%)</div>
+                <div className="qt-value">{toBDT(totals.vatAmount)}</div>
+              </div>
+            </>
+          ) : null}
 
-            {/* ✅ VAT ON হলে: Total + VAT + Grand Total দেখাবে */}
-            {totals?.vatEnabled ? (
-              <>
-                <tr className="row-accent">
-                  <td colSpan={5} className="td-right total-big">
-                    Total =
-                  </td>
-                  <td className="td-right total-big">{toBDT(totals.totalBeforeVat)}</td>
-                </tr>
+          {showDiscountBlock ? (
+            <div className="qt-row">
+              <div className="qt-label">Special Discount</div>
+              <div className="qt-value">-{toBDT(totals.discount || 0)}</div>
+            </div>
+          ) : null}
 
-                <tr className="row-accent">
-                  <td colSpan={5} className="td-right total-big">
-                    Vat ({Math.round((totals.vatRate || 0.1) * 100)}%) =
-                  </td>
-                  <td className="td-right total-big">{toBDT(totals.vatAmount)}</td>
-                </tr>
-
-                <tr className="row-accent">
-                  <td colSpan={5} className="td-right total-big">
-                    Grand Total =
-                  </td>
-                  <td className="td-right total-big">{toBDT(totals.grandTotal)}</td>
-                </tr>
-              </>
-            ) : (
-              <tr className="row-accent">
-                <td colSpan={5} className="td-right total-big">
-                  Grand Total =
-                </td>
-                <td className="td-right total-big">{toBDT(totals.grandTotal)}</td>
-              </tr>
-            )}
-
-            {/* ✅ Discount block (ONLY when enabled) */}
-            {showDiscountBlock ? (
-              <>
-                <tr className="row-accent">
-                  <td colSpan={5} className="td-right total-big">
-                    Special Discount =
-                  </td>
-                  <td className="td-right total-big">{toBDT(totals.discount || 0)}</td>
-                </tr>
-
-                <tr className="row-accent">
-                  <td colSpan={5} className="td-right total-big">
-                    Payable =
-                  </td>
-                  <td className="td-right total-big">{toBDT(totals.payable ?? totals.grandTotal)}</td>
-                </tr>
-              </>
-            ) : null}
-          </tbody>
-        </table>
+          <div className="qt-row qt-grand">
+            <div className="qt-label">{showDiscountBlock ? "Payable" : "Grand Total"}</div>
+            <div className="qt-value">{toBDT(showDiscountBlock ? totals.payable ?? totals.grandTotal : totals.grandTotal)}</div>
+          </div>
+        </div>
 
         <div className="in-words">
           <b>Amount in Words:</b>{" "}
