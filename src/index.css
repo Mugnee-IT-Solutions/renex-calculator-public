@@ -957,7 +957,8 @@ section h3{
   font-weight:500;
   color:#0f172a;
 }
-.invoice--pdf-scale .info-box .info-grid span{
+/* Bold only the FIRST span in each grid row (the label) */
+.invoice--pdf-scale .info-box .info-grid > div > span:first-child{
   font-weight:650;
   color:#0b1220;
 }
@@ -966,7 +967,7 @@ section h3{
   color:#0b1220;
 }
 .invoice--pdf-scale .info-box .info-value{
-  font-weight:500;
+  font-weight:500 !important;
   color:#0f172a;
 }
 
