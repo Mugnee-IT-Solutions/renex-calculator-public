@@ -263,6 +263,13 @@ function zeroRestoreOnBlur(value, setter, disabled = false) {
   if (value === "" || value === null || typeof value === "undefined") setter(0);
 }
 
+/** String for Width/Height inputs when picking from Display Size chips (matches visible chip text). */
+function formatDisplaySizeChipToInput(val) {
+  if (typeof val !== "number" || !Number.isFinite(val)) return "";
+  const trimmed = val.toFixed(4).replace(/\.?0+$/, "");
+  return trimmed === "-0" ? "0" : trimmed;
+}
+
 function buildTotalsForCalc({
   snapshot,
   autoModulesQty,
@@ -311,7 +318,7 @@ function buildTotalsForCalc({
   });
 }
 
-export default function PriceForm({ onChange, onCalculated }) {
+export default function PriceForm({ onChange, onCalculated, displaySizePickRef }) {
   const [dispType, setDispType] = useState("indoor");
 
   // ✅ Cabinet mode (default: without cabinet)
@@ -365,6 +372,20 @@ export default function PriceForm({ onChange, onCalculated }) {
 
   // ✅ IMPORTANT: sft will be auto ONLY
   const [display, setDisplay] = useState({ widthFt: "", heightFt: "", sft: "" });
+
+  const applyDisplaySizePick = useCallback((row, val) => {
+    if (row !== "width" && row !== "height") return;
+    const str = formatDisplaySizeChipToInput(val);
+    setDisplay((d) => (row === "width" ? { ...d, widthFt: str } : { ...d, heightFt: str }));
+  }, []);
+
+  useEffect(() => {
+    if (!displaySizePickRef) return;
+    displaySizePickRef.current = applyDisplaySizePick;
+    return () => {
+      displaySizePickRef.current = null;
+    };
+  }, [displaySizePickRef, applyDisplaySizePick]);
 
   const [rcQty, setRcQty] = useState(10);
   const [psQty, setPsQty] = useState(17);

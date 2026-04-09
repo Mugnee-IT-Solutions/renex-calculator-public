@@ -6,7 +6,7 @@ import { toBDT, bdtToWords, generateRef } from "../lib/calc.js";
 import { CONTROLLERS } from "../data/models.js";
 
 const Invoice = forwardRef(function Invoice({ calc, snapshot, orderDate = new Date() }, ref) {
-  const { model, customer, display, items, tier } = snapshot;
+  const { model, customer, display, items } = snapshot;
   const { totals, unitPrices } = calc;
 
   const dateStr = new Intl.DateTimeFormat("en-GB", {
@@ -122,9 +122,6 @@ const Invoice = forwardRef(function Invoice({ calc, snapshot, orderDate = new Da
   // ✅ Note should show only for Outdoor
   const showOutdoorNote = items?.dispType === "outdoor";
 
-  // ✅ Quality label
-  const qualityLabel = tier?.label || "Gold";
-
   const showDiscountBlock = !!snapshot?.discountEnabled; // only when enabled
 
   return (
@@ -196,16 +193,12 @@ const Invoice = forwardRef(function Invoice({ calc, snapshot, orderDate = new Da
         <div className="price-title">
           <div className="price-title-left">
             <strong>
+              <span className="price-title-prefix">Quotation for:</span>{" "}
               {model.name} <span className="tech-badge"> ({items.technology?.toUpperCase()})</span> LED Display. ({sizeStr}) |
             </strong>
 
             <span className="sft-cal"> Sft:</span>{" "}
             <span className="sft-cal-">({display.sft || "—"}) </span>
-          </div>
-
-          {/* ✅ এখানে Warranty বাদ, শুধু Quality দেখাবে */}
-          <div className={`tier-badge ${tier?.id || "gold"}`} title={`Quality: ${qualityLabel}`}>
-            Quality: {qualityLabel}
           </div>
         </div>
 
@@ -213,27 +206,30 @@ const Invoice = forwardRef(function Invoice({ calc, snapshot, orderDate = new Da
           {rows.map((r) => (
             <div key={r.sl} className="qi-row" role="listitem">
               <div className="qi-main">
-                <div className="qi-name">
-                  <span className="qi-sl">{r.sl}.</span> {r.name}
-                </div>
-                <div className="qi-meta">
-                  <span>
-                    {r.qty} {r.unit}
-                  </span>
-                  <span className="qi-dot" aria-hidden="true">
-                    •
-                  </span>
-                  <span>
-                    Unit: <b>{toBDT(r.unitPrice)}</b>
-                  </span>
-                  {r.brand ? (
-                    <>
+                <div className="qi-block">
+                  <span className="qi-sl">{r.sl}.</span>
+                  <div className="qi-body">
+                    <div className="qi-name">{r.name}</div>
+                    <div className="qi-meta">
+                      <span>
+                        {r.qty} {r.unit}
+                      </span>
                       <span className="qi-dot" aria-hidden="true">
                         •
                       </span>
-                      <span>Brand: {r.brand}</span>
-                    </>
-                  ) : null}
+                      <span>
+                        Unit: <b>{toBDT(r.unitPrice)}</b>
+                      </span>
+                      {r.brand ? (
+                        <>
+                          <span className="qi-dot" aria-hidden="true">
+                            •
+                          </span>
+                          <span>Brand: {r.brand}</span>
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="qi-amt">{toBDT(r.total)}</div>

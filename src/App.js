@@ -16,6 +16,7 @@ export default function App() {
 
   const invoiceRef = useRef(null);
   const termsRef = useRef(null);
+  const displaySizePickRef = useRef(null);
 
   useEffect(() => {
     let alive = true;
@@ -61,6 +62,7 @@ export default function App() {
             </div>
 
             <PriceForm
+              displaySizePickRef={displaySizePickRef}
               onChange={(snap) => setSnapshot(snap)}
               onCalculated={(result, snap) => {
                 setCalc(result);
@@ -213,7 +215,7 @@ export default function App() {
       </div>
 
       {/* ✅ Display Size section (Footer এর উপরে) */}
-      <DisplaySize onPick={() => {}} />
+      <DisplaySize onPick={(row, val) => displaySizePickRef.current?.(row, val)} />
 
       {/* Footer */}
       <footer className="calc-footer">

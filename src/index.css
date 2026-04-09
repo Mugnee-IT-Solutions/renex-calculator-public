@@ -563,16 +563,29 @@ section h3{
 }
 .qi-row:last-child{ border-bottom:0; }
 .qi-main{ min-width:0; flex:1 1 auto; }
+.qi-block{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  min-width:0;
+}
+.qi-sl{
+  flex:0 0 auto;
+  min-width:1.6em;
+  font-weight:800;
+  line-height:1.25;
+  font-size:13.5px;
+  color:#0f172a;
+}
+.qi-body{
+  flex:1 1 auto;
+  min-width:0;
+}
 .qi-name{
   color:#0f172a;
   font-weight:650;
   font-size:13.5px;
   line-height:1.25;
-}
-.qi-sl{
-  display:inline-block;
-  min-width:18px;
-  font-weight:800;
 }
 .qi-meta{
   margin-top:4px;
@@ -935,14 +948,26 @@ section h3{
   font-size:13.5px;
   letter-spacing:.4px;
   text-transform:none;
-  font-weight:800;
+  font-weight:700;
+  color:#0b1220;
 }
 .invoice--pdf-scale .info-box .info-grid{
   gap:8px 14px;
   font-size:12.5px;
+  font-weight:500;
+  color:#0f172a;
 }
 .invoice--pdf-scale .info-box .info-grid span{
-  font-weight:800;
+  font-weight:650;
+  color:#0b1220;
+}
+.invoice--pdf-scale .info-box .info-label{
+  font-weight:650;
+  color:#0b1220;
+}
+.invoice--pdf-scale .info-box .info-value{
+  font-weight:500;
+  color:#0f172a;
 }
 
 /* Title pill */
