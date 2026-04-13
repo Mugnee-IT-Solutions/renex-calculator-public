@@ -1,242 +1,132 @@
 <div align="center">
 
-# Renex LED Display Builder
+# Renex LED Display Quotation Suite
 
-**A client-facing web app to configure LED display projects, calculate BDT pricing, preview branded quotations, and export a two-page PDF (invoice + terms).**
+**A client-ready web experience for configuring LED display projects, calculating Bangladesh Taka (BDT) pricing, and producing polished, brand-consistent PDF quotations.**
 
-[![React](https://img.shields.io/badge/React-19.2-61DAFB?logo=react&logoColor=white)](https://react.dev/)
-[![Create React App](https://img.shields.io/badge/CRA-5.0.1-09D3AC?logo=create-react-app&logoColor=white)](https://create-react-app.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Node](https://img.shields.io/badge/node-%3E%3D18-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
-
-[Live site context](https://mugnee.com/) · [LED Display category](https://www.mugnee.com/product-category/led-display/) · [Repository](https://github.com/mugnee-it/Renex-Calculator)
+[Visit Mugnee IT Solution](https://mugneeit.com)
 
 </div>
-
----
-
-## Table of contents
-
-| | |
-| :--- | :--- |
-| [Overview](#overview) | What this product is and who it is for |
-| [Key features](#key-features) | Calculator, preview, PDF, datasheets |
-| [Tech stack](#tech-stack) | Libraries and tooling |
-| [How it works](#how-it-works) | User flow and architecture |
-| [Project structure](#project-structure) | Folders and responsibilities |
-| [Getting started](#getting-started) | Install, run, test, build |
-| [Configuration](#configuration) | Env files and assets |
-| [PDF export](#pdf-export) | How quotations are generated |
-| [Pricing logic](#pricing-logic-summary) | High-level rules (see code for detail) |
-| [Credits](#credits) | Branding and development |
 
 ---
 
 ## Overview
 
-| | |
+The **Renex LED Display Quotation Suite** is a business tool built for sales teams, channel partners, and technical presales who need **fast, accurate quotes** without juggling spreadsheets and design files. Users walk through display technology choices, hardware line items, commercial terms, and area-based options—then receive a **clear grand total in BDT**, an **on-screen quotation preview**, and a **print-ready PDF** that matches the Renex brand.
+
+The product reduces manual errors, shortens quote turnaround, and gives every customer a **consistent, professional document** that reflects your standards.
+
+---
+
+## Key Features
+
+- **Guided configuration** for indoor and outdoor LED projects, including common module technologies and tiered product options.
+- **Structured hardware selection** for modules, receiving cards, power supplies, cabinets, and leading controller and processor families.
+- **Area and sizing assistance** with practical presets so teams can move from dimensions to quantities without guesswork.
+- **Commercial controls** for accessories, installation, VAT-related options, discounts, and payment context—aligned to how real projects are sold.
+- **Live quotation preview** with invoice-style layout and a dedicated terms section for a complete customer-ready package.
+- **One-click PDF export** delivering a **two-page A4 document** (quotation plus terms) with branding, watermarking, and a professional finish.
+- **Support for product documentation** so relevant specification materials can sit alongside the quoting workflow (where deployed).
+
+---
+
+## Industry & Use Cases
+
+| Context | How it helps |
 | :--- | :--- |
-| **Product name** | Renex **LED Display Builder** (quotation calculator) |
-| **Purpose** | Sales engineers and partners can pick display technology, pitch, controllers, area, VAT/discount options, and payment terms—then get a **Grand Total in BDT**, a **print-ready preview**, and **`Renex_Quotation.pdf`**. |
-| **Brand** | Renex IT Solutions (header/footer, invoice template, watermark). |
-| **Audience** | Internal sales / dealers who need **consistent pricing** and **professional PDF output** without a separate design tool. |
+| **LED display vendors & integrators** | Standardize pricing and quoting across branches and partners. |
+| **Pro AV and signage resellers** | Respond to RFQs faster with defensible totals and clean PDFs. |
+| **Technical sales & estimators** | Reduce rework by capturing configuration, commercial rules, and output in one place. |
 
-> **Note:** Module catalogue prices and business rules live in `src/data/models.js` and `src/lib/calc.js`. Update those when commercial terms change.
+Ideal for organizations that sell **fine-pitch indoor displays**, **high-brightness outdoor products**, and **full video-wall packages** where accuracy and presentation quality both matter.
 
 ---
 
-## Key features
+## System Workflow
 
-<details>
-<summary><strong>Click to expand feature list</strong></summary>
+1. **Open the quoting experience** in the browser—no separate design tool required.
+2. **Choose project basics**: environment (indoor/outdoor), technology options, pitch, and service tier where applicable.
+3. **Enter quantities** for modules, structure, power, control, and processing based on the bill of materials.
+4. **Set area and sizing inputs** (including quick size selections) so accessories and installation logic align with the footprint.
+5. **Apply commercial terms**: VAT-related choices, discounts, installation, and accessories—automatic or manual, depending on policy.
+6. **Calculate** to refresh line items, subtotals, taxes, and the **grand total in BDT**, with human-readable amounts where appropriate.
+7. **Review** the on-screen invoice and terms tabs for accuracy and messaging.
+8. **Export PDF** to share a **two-page Renex-branded quotation** with customers or internal approvers.
 
-| Area | Details |
+---
+
+## Technology Stack
+
+This solution was delivered as a **modern, browser-based application** using proven web technologies:
+
+| Area | Technologies |
 | :--- | :--- |
-| **Configuration** | Indoor / outdoor, **SMD**, **GOB**, **COB** (where applicable), pitch selection, **Gold / Platinum / Diamond** tiers (warranty display varies by tier). |
-| **Hardware lines** | Module qty, receiving cards, power supplies, **HD / Novastar** controllers & video processors, **640×480 mm cabinet** quantities and pricing. |
-| **Area & sizing** | Square footage input plus **Display Size** chip picker (width/height presets, P3/P6 grid, cabinet-based sizes) to push values into the form. |
-| **Commercial** | Accessories (auto by area or manual), installation (auto by area or manual %/fixed), **VAT** (with configurable markup + rate), **discount** in BDT. |
-| **Output** | **Grand Total** summary, **Invoice** and **Terms & Conditions** tabs, amount in **words** (crore/lakh style), auto **quotation reference** (`RDQ-…`). |
-| **PDF** | One click → **two A4 pages**: page 1 invoice, page 2 terms; uses **html2canvas** + **pdf-lib**, company **template strips** and **watermark**. |
-| **Datasheets** | Bundled **PDF brochures** under `public/Renex Product data sheet/`; export flow can resolve paths for module catalogue attachments (see `PDFButton.jsx`). |
+| **User interface** | React (industry-standard component model for responsive, maintainable screens) |
+| **Application shell** | Create React App–style workflow for structured development and deployment |
+| **Visual design** | Tailwind CSS and complementary styling for a clean, consistent layout |
+| **Document output** | Client-side PDF assembly and high-fidelity page capture for pixel-accurate quotations |
+| **Quality** | Automated UI testing patterns suitable for ongoing regression confidence |
 
-</details>
+*Stack reflects the delivered project; this repository is a showcase only and does not include implementation files.*
 
 ---
 
-## Tech stack
+## Screenshots
 
-| Layer | Choice |
+Add your visuals under the `screenshots/` folder and link them below. Suggested filenames:
+
+| Suggested file | What to capture |
 | :--- | :--- |
-| **UI** | React 19, Create React App (`react-scripts` 5) |
-| **Styling** | Tailwind CSS 3 + PostCSS + custom CSS (invoice layout, topbar, display-size chips) |
-| **Math & copy** | `src/lib/calc.js` — BDT formatting, amount in words, `calcAll`, reference IDs |
-| **Catalogue data** | `src/data/models.js` — model groups, controller list, PSU base price |
-| **PDF / canvas** | `html2canvas`, `pdf-lib` (multi-page stitch), `jspdf` present in dependencies |
-| **Tests** | React Testing Library (`npm test`) |
+| `screenshots/01-hero-dashboard.png` | Overall application shell and branding |
+| `screenshots/02-configuration-form.png` | Main quoting and calculation form |
+| `screenshots/03-display-sizing.png` | Area, sizing, or preset selection experience |
+| `screenshots/04-invoice-preview.png` | Quotation / invoice preview |
+| `screenshots/05-terms-preview.png` | Terms and conditions preview |
+| `screenshots/06-pdf-export.png` | Download action or sample PDF pages (sanitized) |
+
+When your captures are ready, reference them from this section using paths such as `./screenshots/01-hero-dashboard.png` (and the other filenames in the table). That keeps the document easy to update without touching the rest of the page.
 
 ---
 
-## How it works
+## Architecture (High Level)
 
-```mermaid
-flowchart LR
-  A[Price form] --> B[Calculate]
-  B --> C[calcAll + snapshot]
-  C --> D[Invoice preview]
-  C --> E[Terms preview]
-  D --> F[Download PDF]
-  E --> F
-  G[Display size chips] --> A
-```
+At a conceptual level, the solution separates **what the user configures** from **how numbers and documents are produced**:
 
-1. User fills **PriceForm** and clicks **Calculate**.  
-2. **`calcAll`** returns line totals, VAT, discount, payable; form state becomes **`snapshot`** for the invoice/terms components.  
-3. **Preview** uses on-screen A4 styling; **hidden duplicate DOM** (`pdf-page-1`, `pdf-page-2`) feeds **PDFButton** for pixel-accurate export.  
-4. **DisplaySize** section sends picked width/height into the form via ref callback.
+- **Presentation layer** — Forms, previews, and brand-aligned layouts that staff interact with daily.
+- **Calculation and rules layer** — Encapsulated business logic that turns inputs into line items, taxes, discounts, and totals in BDT.
+- **Document generation** — A dedicated path that renders quotation and terms content into **multi-page PDFs** suitable for email, print, and archival.
+- **Static assets** — Logos, templates, watermarks, and optional product PDFs that support a complete customer-facing package.
+
+This structure keeps the experience fast in the browser while protecting consistency across every quote that leaves the organization.
 
 ---
 
-## Project structure
+## Source Code Notice
 
-```text
-RenexCalculator/
-├── public/
-│   ├── logo.png / logo-site.*     # Brand assets
-│   ├── Renex_Invoice.png          # A4 template strips (header/footer)
-│   ├── renex_watermark.png        # Watermark source
-│   ├── signature.png
-│   └── Renex Product data sheet/  # Module, controller, PSU PDFs (linked from export logic)
-├── src/
-│   ├── components/
-│   │   ├── PriceForm.jsx          # Main form + calculate
-│   │   ├── Invoice.jsx            # Quotation layout
-│   │   ├── TermsPage.jsx          # Terms & conditions
-│   │   ├── PDFButton.jsx          # html2canvas + pdf-lib export
-│   │   └── DisplaySize.jsx      # Quick size chips
-│   ├── data/
-│   │   └── models.js              # MODEL_GROUPS, CONTROLLERS, PSU price
-│   ├── lib/
-│   │   ├── calc.js                # Pricing engine + BDT helpers
-│   │   └── watermark.js           # Transparent watermark data URL
-│   ├── App.js                     # Shell: header, preview, PDF targets, footer
-│   ├── index.js
-│   └── App.test.js
-├── tailwind.config.js
-├── postcss.config.js
-├── package.json
-└── README.md
-```
+**The production source code, pricing data, and internal configuration for this project are private.** They are withheld to protect **security**, **intellectual property**, and **client confidentiality**. This public repository exists solely as a **portfolio and capability showcase** for Mugnee IT Solution.
+
+If you are evaluating a similar build—quoting tools, PDF workflows, or vertical-specific configurators—please reach out to discuss scope, hosting, and delivery under an appropriate NDA or engagement.
 
 ---
 
-## Getting started
+## Built by Mugnee IT Solution
 
-### Prerequisites
+**Mugnee IT Solution** designs and delivers custom software, integrations, and digital products for businesses that need reliable, client-ready outcomes.
 
-- **Node.js** 18+ recommended (LTS)
-- **npm** (ships with Node)
-
-### Install
-
-```bash
-git clone https://github.com/mugnee-it/Renex-Calculator.git
-cd Renex-Calculator
-npm install
-```
-
-### Run (development)
-
-```bash
-npm start
-```
-
-Opens [http://localhost:3000](http://localhost:3000) with hot reload.
-
-### Test
-
-```bash
-npm test
-```
-
-### Production build
-
-```bash
-npm run build
-```
-
-Output: `build/` — deploy that folder to any static host (Netlify, Vercel, S3, IIS, nginx, etc.).
+- **Website:** [https://mugneeit.com](https://mugneeit.com)
 
 ---
 
-## Configuration
+## Work With Us
 
-| Topic | Notes |
-| :--- | :--- |
-| **Secrets** | No API keys required for core calculator. Keep `.env.*` files local; they are gitignored by CRA defaults where applicable. |
-| **Paths** | Static PDF paths under `public/` are referenced from export helpers; renaming folders requires updating `PDFButton.jsx` maps. |
-| **Robots** | `public/robots.txt` present for web deployment tuning. |
+If you need a **branded quoting portal**, **CPQ-style configurator**, **PDF or document automation**, or a **full product team** to own delivery end-to-end, we would welcome a conversation. Share your goals, timeline, and compliance requirements—we will outline a practical path from discovery to launch.
 
----
-
-## PDF export
-
-| Step | Implementation |
-| :--- | :--- |
-| Capture | **html2canvas** on `#pdf-page-1` and `#pdf-page-2` (off-screen, fixed A4 width in px) |
-| Assembly | **pdf-lib** embeds raster pages at A4 size (`595.28 × 841.89` pt) |
-| Branding | Template strips from `Renex_Invoice.png`, optional processed **watermark** from `makeTransparentWatermarkDataUrl()` |
-| Filename | Default download: **`Renex_Quotation.pdf`** |
-
----
-
-## Pricing logic (summary)
-
-| Component | Behaviour (short) |
-| :--- | :--- |
-| **Units** | Integer-ish quantities; money values rounded **up** to whole BDT where applied (`ceil`). |
-| **Tiers** | Gold / Platinum / Diamond select per-module unit bands from `MODEL_GROUPS`. |
-| **VAT mode** | When enabled, a **tax markup** factor applies to effective unit prices and certain add-ons before **VAT amount** on subtotal + install path (see `calcAll`). |
-| **Accessories** | Auto: by **sq ft** thresholds; outdoor applies a multiplier; manual override available. |
-| **Installation** | Auto by area or manual (fixed or % of subtotal for install base). |
-| **Discount** | Optional BDT discount capped so payable never goes negative. |
-
-For exact formulas, read **`src/lib/calc.js`** and form wiring in **`src/components/PriceForm.jsx`**.
-
----
-
-## Screenshot placeholder
-
-<div align="center">
-
-| Add your hero image here |
-| :---: |
-| `![Renex LED Display Builder](docs/screenshot.png)` |
-
-*Create a `docs/` folder, drop a wide screenshot, and uncomment or add the line above for a rich GitHub readme header.*
-
-</div>
-
----
-
-## Credits
-
-| | |
-| :--- | :--- |
-| **Developed by** | Renex IT Solutions |
-| **Product context** | [mugnee.com](https://mugnee.com/) |
-| **Repository** | [github.com/mugnee-it/Renex-Calculator](https://github.com/mugnee-it/Renex-Calculator) |
-
----
-
-## License
-
-No `LICENSE` file is bundled in this repository. Add one (e.g. MIT for open source, or a proprietary notice) if you redistribute or open-source the codebase.
+**[Contact Mugnee IT Solution](https://mugneeit.com)**
 
 ---
 
 <div align="center">
 
-**Built for accurate LED quotations and a consistent Renex-branded PDF experience.**
+*Portfolio showcase repository — documentation and visuals only.*
 
 </div>
