@@ -6,6 +6,10 @@
 
 [Visit Mugnee IT Solution](https://mugneeit.com)
 
+![Renex LED Display Quotation Suite — configuration, BDT totals, and live quotation preview](./screenshots/screencapture-localhost-3000-2026-04-13-16_16_37.png)
+
+*Quoting workspace: product configuration, commercial options, grand total in Bangladesh Taka, and on-screen invoice preview.*
+
 </div>
 
 ---
@@ -73,18 +77,17 @@ This solution was delivered as a **modern, browser-based application** using pro
 
 ## Screenshots
 
-Add your visuals under the `screenshots/` folder and link them below. Suggested filenames:
+The **preview at the top of this page** (`screencapture-localhost-3000-2026-04-13-16_16_37.png`) shows the **main quoting flow**: form inputs, calculated totals in **BDT**, and the **branded quotation preview** together—so visitors see the product before reading the detail sections.
+
+You can add more captures under `screenshots/` when needed—for example:
 
 | Suggested file | What to capture |
 | :--- | :--- |
-| `screenshots/01-hero-dashboard.png` | Overall application shell and branding |
-| `screenshots/02-configuration-form.png` | Main quoting and calculation form |
-| `screenshots/03-display-sizing.png` | Area, sizing, or preset selection experience |
-| `screenshots/04-invoice-preview.png` | Quotation / invoice preview |
-| `screenshots/05-terms-preview.png` | Terms and conditions preview |
-| `screenshots/06-pdf-export.png` | Download action or sample PDF pages (sanitized) |
-
-When your captures are ready, reference them from this section using paths such as `./screenshots/01-hero-dashboard.png` (and the other filenames in the table). That keeps the document easy to update without touching the rest of the page.
+| `screenshots/02-configuration-form.png` | Tighter crop on the configuration form |
+| `screenshots/03-display-sizing.png` | Display size / area presets |
+| `screenshots/04-invoice-preview.png` | Full invoice preview tab |
+| `screenshots/05-terms-preview.png` | Terms & conditions tab |
+| `screenshots/06-pdf-export.png` | PDF download or exported pages (sanitized) |
 
 ---
 
